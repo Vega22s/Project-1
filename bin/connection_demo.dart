@@ -49,7 +49,48 @@ Future<void> showMenu(int userId, String username) async {
     final expenses = json.decode(response.body) as List;
     final today = DateTime.now();
 
-    if (choice == '6') {
+    if (choice == '1') {
+      print("----------- All expenses -----------");
+      double total = 0;
+      int count = 1;
+      for (var e in expenses) {
+        final date = DateTime.parse(e['date']).toLocal();
+        print("$count. ${e['item']} : ${e['paid']}฿ : ${date.toString()}");
+        total += (e['paid'] as num).toDouble();
+        count++;
+      }
+      print("Total expenses = ${total.toStringAsFixed(0)}฿");
+    } else if (choice == '2') {
+      print("----------- Today's expenses -----------");
+      double total = 0;
+      int count = 1;
+      for (var e in expenses) {
+        final date = DateTime.parse(e['date']).toLocal();
+        if (date.year == today.year &&
+            date.month == today.month &&
+            date.day == today.day) {
+          print("$count. ${e['item']} : ${e['paid']}฿ : ${date.toString()}");
+          total += (e['paid'] as num).toDouble();
+          count++;
+        }
+      }
+      print("Total expenses = ${total.toStringAsFixed(0)}฿");
+    } else if (choice == '3') {
+      stdout.write("Search item: ");
+      final keyword = stdin.readLineSync() ?? "";
+      final found = expenses.where(
+        (e) =>
+            e['item'].toString().toLowerCase().contains(keyword.toLowerCase()),
+      );
+      if (found.isEmpty) {
+        print("No matching expenses.");
+      } else {
+        for (var e in found) {
+          final date = DateTime.parse(e['date']).toLocal();
+          print("${e['item']} : ${e['paid']}฿ : ${date.toString()}");
+        }
+      }
+    } else if (choice == '6') {
       print("----- Bye ------");
       break;
     } else {
