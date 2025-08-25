@@ -90,6 +90,51 @@ Future<void> showMenu(int userId, String username) async {
           print("${e['item']} : ${e['paid']}฿ : ${date.toString()}");
         }
       }
+    } else if (choice == '4') {
+      print("===== Add new item =====");
+      stdout.write("Item: ");
+      final item = stdin.readLineSync() ?? "";
+      stdout.write("Paid: ");
+      final paid = double.tryParse(stdin.readLineSync() ?? "0") ?? 0;
+
+      final newExpense = {
+        "user_id": userId,
+        "item": item,
+        "paid": paid,
+        "date": DateTime.now().toIso8601String(),
+      };
+
+      final addUrl = Uri.parse('http://localhost:3000/expenses');
+      final addResponse = await http.post(
+        addUrl,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(newExpense),
+      );
+
+      if (addResponse.statusCode == 201) {
+        print("Inserted!");
+      } else {
+        print("Failed to insert.");
+      }
+    } else if (choice == '5') {
+      print("===== Delete an expense =====");
+      for (int i = 0; i < expenses.length; i++) {
+        print("${i + 1}. ${expenses[i]['item']} : ${expenses[i]['paid']}฿");
+      }
+      stdout.write("Enter number to delete: ");
+      final idx = int.tryParse(stdin.readLineSync() ?? "");
+      if (idx != null && idx > 0 && idx <= expenses.length) {
+        final expenseId = expenses[idx - 1]['id'];
+        final delUrl = Uri.parse('http://localhost:3000/expenses/$expenseId');
+        final delResponse = await http.delete(delUrl);
+        if (delResponse.statusCode == 200) {
+          print("Deleted!");
+        } else {
+          print("Failed to delete.");
+        }
+      } else {
+        print("Invalid choice.");
+      }
     } else if (choice == '6') {
       print("----- Bye ------");
       break;
